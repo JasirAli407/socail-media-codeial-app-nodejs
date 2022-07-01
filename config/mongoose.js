@@ -8,4 +8,7 @@ db.on('error', console.error.bind(console,'Error connecting to db'));
 
 db.once('open',()=>
 console.log("Connected to db")
-)
+);
+
+
+module.exports = db;

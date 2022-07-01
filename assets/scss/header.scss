@@ -1,0 +1,39 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 35px;
+    background-color:#048add;
+    color: white;
+
+    h4{
+        margin-left: 10px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        ul{
+            display: flex;
+            list-style: none;
+           width: 9%;
+            font-size: 16px;
+            margin-right: 15px;
+            box-sizing: border-box;
+            
+            justify-content: space-between;
+
+            li{
+              
+            }
+
+            a{
+            text-decoration: none;
+            color: white;
+            }
+
+        }
+}
