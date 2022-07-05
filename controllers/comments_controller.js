@@ -2,32 +2,34 @@ const Comment = require('../models/comment');
 const { findById } = require('../models/post');
 const Post = require('../models/post');
 
-module.exports.create = function(req,res){
+module.exports.create = async function(req,res){
+  try{
 
-    Post.findById(req.body.post, function(err,post){
-        if(err){console.log(`error finding post ${err}`)}
-        if(post){
-            Comment.create({
-                content: req.body.content,
-                post: req.body.post,
-                user: req.user._id
-            }, function(err,comment){
-        if(err){console.log(`error creating comment ${err}`);}
+   let post = await Post.findById(req.body.post);
+    if(post){        
+       let comment = await Comment.create({
+            content: req.body.content,
+            post: req.body.post,
+            user: req.user._id
+        })
 
-        post.comments.push(comment);
-        post.save();
-        res.redirect('/');                  
+    post.comments.push(comment);
+    post.save();
+    res.redirect('/'); 
+    }
+  }catch(err){
+    console.log('Error', err);
+  }
 
-            })
-        }
-    });
 }
-
+   
 
 
 module.exports.destroy = function(req,res){
+    
     Comment.findById(req.params.id, function(err, comment){
-        if(req.user.id == comment.user || req.user.id == comment.post.user.id){
+       
+        if(req.user.id == comment.user){
 
             let postId = comment.post;
 
