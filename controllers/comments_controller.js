@@ -15,10 +15,12 @@ module.exports.create = async function(req,res){
 
     post.comments.push(comment);
     post.save();
-    res.redirect('/'); 
+    req.flash('success', 'Comment created successfully');
+    return res.redirect('back'); 
     }
   }catch(err){
-    console.log('Error', err);
+    req.flash('error', err);
+    return res.redirect('back');     
   }
 
 }
@@ -36,9 +38,18 @@ module.exports.destroy = function(req,res){
             comment.remove();
             //  $pull ithoke mongoose provide cheyyunnathaan
             Post.findByIdAndUpdate(postId, {$pull: {comments: req.params.id}}, function(err, post){
+              if(err){
+                req.flash('error',err);
+                return  res.redirect('back');
+              }
+
+             req.flash('success', 'Comment Deleted Successfully');
+              
               return  res.redirect('back');
             })
         }else{
+          req.flash('error', 'You are not allowed to deleteComment');
+
           return  res.redirect('back');
         }
     });
