@@ -1,4 +1,6 @@
 const User = require("../models/user");
+const fs = require('fs');
+const path = require('path');
 
 module.exports.profile = function(req,res){
      // return res.end('<h1>User Profile</h1>');
@@ -11,15 +13,56 @@ module.exports.profile = function(req,res){
     
 }
 
-module.exports.update = function(req, res){
-     if(req.params.id == req.user.id){
-     // User.findByIdAndUpdate(req.params.id, {name: req.body.name, email: req.body.email}, callback function)  OR
-     User.findByIdAndUpdate(req.params.id, req.body, function(err, user){
-          return res.redirect('back')
+module.exports.update = async function(req, res){
+//      if(req.params.id == req.user.id){
+//      // User.findByIdAndUpdate(req.params.id, {name: req.body.name, email: req.body.email}, callback function)  OR
+//      User.findByIdAndUpdate(req.params.id, req.body, function(err, user){
+//           return res.redirect('back')
+//      })
+// }else{
+//      return res.status(401).send('Unauthorized')
+// }
+if(req.params.id == req.user.id){
+     // console.log(req.params)
+   try{
+     let user = await User.findById(req.params.id);
+     // body parser cant parse content of form bcos now its a multipart form...for that there is MULTER to read it(here uploadedAvatar())
+     User.uploadedAvatar(req, res, function(err){
+           if(err){console.log('*****Multer Error', err);}
+
+          //  console.log(req.file);
+          //  console.log(req.body);
+
+           user.name = req.body.name;
+           user.email = req.body.email;
+
+           if(req.file){
+
+               if(user.avatar){
+                    // to delete the file
+                    fs.unlinkSync( path.join(__dirname,'..',user.avatar))
+
+               }
+               // this is saving the path of uploaded file into avatar field in the user
+               user.avatar = User.avatarPath + '/' + req.file.filename;
+               // console.log(user.avatar)
+           }
+           user.save();
+           req.flash('success', 'Successfully Updated');
+           return res.redirect('back')
      })
+   }catch(err){
+      req.flash('error', err);
+      return res.redirect('back');
+   }
+
+
 }else{
+     req.flash('error', 'Unauthorized');
      return res.status(401).send('Unauthorized')
 }
+       
+
 }
 
 module.exports.signUp = function(req,res){
