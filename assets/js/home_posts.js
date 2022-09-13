@@ -19,17 +19,17 @@
           $("#posts-list-container>ul").prepend(newPost);
           // newPostile .delete-post-button class olla elmnt idkunnadh ingnen theres a space b4 writing class
           deletePost($(" .delete-post-button", newPost));
-            
-          // new PostComments(data.data.post._id);
-          new Noty({
-            type: 'success',
-            theme: 'mint',     
-            layout:'topRight', 
-            text: 'Post Published',
-            timeout: 1500
-            
-        }).show();
 
+          new ToggleLike($(" .toggle-like-button", newPost));
+          new PostComments(data.data.post._id);
+
+          new Noty({
+            type: "success",
+            theme: "mint",
+            layout: "topRight",
+            text: "post aay",
+            timeout: 1500,
+          }).show();
         },
         error: function (error) {
           console.log(error.responseText);
@@ -40,7 +40,7 @@
 
   // method to create a post in DOM
   let newPostDom = function (post) {
-    return $(` <li id="post-${post._id}">
+    return $(`<li id="post-${post._id}">
         <p>
            
             <small><a class="delete-post-button" href="/posts/destroy/${post._id}">X</a></small>
@@ -48,12 +48,18 @@
              ${post.content}
         <br>
         <small>${post.user.name}</small>
+             
+        <small>        
+        <a href="/likes/toggle/?id=${post._id}&type=Post">0 Likes</a>  
+        </small>
+       
+
         </p>
     
         
         <div id="post-comments">
            
-            <form action="/comments/create" method="post">
+            <form action="/comments/create"  id="post-${post._id}-comments-form" method="post">
                 <input type="text" name="content" placeholder="Type Here to add comment..." required>
                 <input type="hidden" name="post" value="${post._id}">
                 <input type="submit" value="Add Comment">
@@ -71,7 +77,7 @@
         </div>
         <br><br>
             
-    </li> `);
+    </li>`);
   };
 
   // method to delete a post from DOM
@@ -86,6 +92,14 @@
         success: function (data) {
           // console.log(data)
           $(`#post-${data.data.post_id}`).remove();
+
+          new Noty({
+            type: "success",
+            theme: "mint",
+            layout: "topRight",
+            text: "post delete aay",
+            timeout: 1500,
+          }).show();
         },
         error: function (error) {
           console.log(error.responseText);
@@ -93,17 +107,17 @@
       });
     });
   };
-  
-let convertPostsToAjax = function(){
-$('#posts-list-container>ul>li').each(function(){
-  let deleteButton = $(' .delete-post-button', this);
-  deletePost(deleteButton);
 
-})
+  let convertPostsToAjax = function () {
+    $("#posts-list-container>ul>li").each(function () {
+      let deleteButton = $(" .delete-post-button", this);
+      deletePost(deleteButton);
 
-}
-  
+      let postId = $(this).prop("id").split("-")[1];
+      new PostComments(postId);
+    });
+  };
 
-convertPostsToAjax()
+  convertPostsToAjax();
   createPost();
 }

@@ -9,20 +9,37 @@ const app = express();
 const session = require('express-session'); 
 const passport = require('passport');
 const passportLocal = require('./config/passport-local-strategy');
+const passportJWT = require('./config/passport-jwt-strategy');
+const passportGoogle = require('./config/passport-google-oauth2-strategy')
 const MongoStore = require('connect-mongo'); 
 const sassMiddleware = require('node-sass-middleware') ;
 const flash = require('connect-flash');
 const customMware = require('./config/middleware');
+const cors = require('cors')
+
+
+app.use(cors({
+    origin: '*'
+}))
+
+// setup the chat server to be used with socket.io
+const chatServer = require('http').Server(app);
+const chatSockets = require('./config/chat_sockets').chatSockets(chatServer);
+chatServer.listen(5000);
+console.log('chat server is listening on port 5000')
 
 app.use(sassMiddleware({
     src: './assets/scss',
     dest: './assets/css',
-    debug: 'true',
+    // debug: 'true',
     outputStyle: 'extended',
     prefix: '/css'
 }))
+// for reading through the post request
+// app.use(bodyParser.urlencoded({extended: false}));
+app.use(express.urlencoded({extended: false}));
 
-app.use(bodyParser.urlencoded({extended: false}));
+
 
 app.use(cookieParser());
 
@@ -65,6 +82,8 @@ app.use(passport.setAuthenticatedUser);
 
 app.use(flash());
 app.use(customMware.setFlash);
+
+
 
 
 // use express router

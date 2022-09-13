@@ -1,0 +1,44 @@
+class ToggleLike{
+    
+    constructor(toggleElement){
+     this.toggler = toggleElement,
+     this.toggleLike()
+    }
+
+
+
+    toggleLike(){
+        $(this.toggler).click(function(e){
+        e.preventDefault();
+          let self = this;
+
+            // this is a new way of writing ajax which you might've studied, it looks like the same as promises
+
+            $.ajax({
+            type: 'post',
+            url : $(self).prop('href')            
+        })
+           .done(function(data){
+            // console.log(data.data);
+              let likesCount = parseInt($(self).attr('data-likes'));
+            //   console.log(likesCount);
+
+            if(data.data.deleted == true){
+                likesCount-=1;
+             
+            }
+            else{
+                likesCount+=1;
+
+            }
+
+            $(self).attr('data-likes', likesCount);
+            $(self).html(`${likesCount} Likes`)
+           })
+           .fail((err)=>{
+            console.log(err);
+           })
+        })
+       
+    }
+}

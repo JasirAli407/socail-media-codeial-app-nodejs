@@ -13,18 +13,51 @@ module.exports.home = async function (req, res) {
   //         posts : posts
   //     });
   //      })
+    
+      
+
+  
+      // ith oru alternative way
+  // res.headers({"Access-Control-Allow-Origin" : "*"})
 
   try{
-  let posts = await Post.find({})
+        // CHANGE :: populate the likes of each post and comment
+
+   let posts = await Post.find({})
     .sort('-createdAt')  // to sort latest one on top
     .populate("user")
     .populate({
       path: "comments",
-      populate: {
-        path: "user",
-      }
-    });
+      populate: 
+       [ 'user', 'likes'   ]
+      
+      // ,
+      //  populate: {
+      //    path: 'likes'
+      //  }
+      
+    })
+    .populate('likes')
+    ;
 
+    // console.log('ithaan posts', posts)
+
+    // for(post of posts){
+    //   console.log(post.comments);
+    // }
+
+    // posts.forEach((dt)=>{
+    //    console.log(dt.comments);
+    //   dt.comments.forEach(async (comment)=>{
+    //     console.log(comment)
+    //     let user = await User.findOne({_id:comment.user});
+    //     console.log(user);
+    //     comment.user = user;
+    //   })
+    //   // console.log(dt.comments);
+    // })
+
+    // console.log('ithaan posts', posts)
   let users = await User.find({});
 
   return res.render("home", {
